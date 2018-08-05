@@ -8,9 +8,14 @@ dependencies:
   firebase_auth: "^0.5.11"
   google_sign_in: "^3.0.4"
   camera: "^0.2.1"
+#  camera:
+#   git:
+#    url: git://github.com/Chintan1193/plugins.git
+#    path: packages/camera
   firebase_ml_vision: "^0.0.1"
   path_provider: "^0.4.1"
   image: "^2.0.4"
+  quick_actions: "^0.2.1"
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

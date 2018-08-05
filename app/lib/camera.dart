@@ -9,6 +9,7 @@ import 'package:image/image.dart' as ImageLibrary;
 import 'dart:isolate';
 import 'image.dart' as util;
 import 'dart:math';
+import 'package:flutter/services.dart';
 
 class CameraWidget extends StatefulWidget {
   CameraWidget({Key key}) : super(key: key);
@@ -58,6 +59,7 @@ class CameraWidgetState extends State<CameraWidget> {
       controller.initialize().then((_) {
         if (mounted) {
           this._setLoading(false);
+          _getCameraAngle();
         }
       });
     });
@@ -84,6 +86,10 @@ class CameraWidgetState extends State<CameraWidget> {
     try {
       String path = await getTempFilePath();
       await controller.takePicture(path);
+
+      // Getting image angle
+      _getImageAngle(path);
+
       _setDetecting(true, CircularProgressIndicator(), 'Detecting...');
       List<int> bytes = await (File(path)).readAsBytes();
       Widget image = Image.memory(bytes);
@@ -135,5 +141,42 @@ class CameraWidgetState extends State<CameraWidget> {
                         onPressed: detectText, child: Text('Detect'))))
       ]);
     }
+  }
+
+  static const platform = const MethodChannel('samples.flutter.io/battery');
+  int _cameraAngle = 0;
+
+  Future<Null> _getCameraAngle() async {
+    int cameraAngle = 0;
+    try {
+      final int result = await platform.invokeMethod('getCameraAngle');
+      cameraAngle = result;
+      print("Camera angle: '$cameraAngle'.");
+    } on PlatformException catch (e) {
+      //cameraAngle = "Failed to get camera angle: '${e.message}'.";
+      print("Failed to get camera angle: '${e.message}'.");
+    }
+
+    setState(() {
+      _cameraAngle = cameraAngle;
+    });
+  }
+
+  int _imageAngle = 0;
+
+  Future<Null> _getImageAngle(String path) async {
+    int imageAngle = 0;
+    try {
+      final int result = await platform.invokeMethod('getImageAngle', {"path" : path});
+      imageAngle = result;
+      print("Image angle: '$imageAngle'.");
+    } on PlatformException catch (e) {
+      //imageAngle = "Failed to get image angle: '${e.message}'.";
+      print("Failed to get image angle: '${e.message}'.");
+    }
+
+    setState(() {
+      _imageAngle = imageAngle;
+    });
   }
 }
